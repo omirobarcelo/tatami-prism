@@ -1,11 +1,13 @@
 <script lang="ts">
+  import { onDestroy } from 'svelte';
   import { eventListener } from '$lib/stores/event-emitter.store';
   import { log } from '$lib/stores/log.store';
   import Game from './components/Game.svelte';
   import KeyItems from './components/KeyItems.svelte';
   import Log from './components/Log.svelte';
 
-  eventListener();
+  const unsubscribe = eventListener();
+  onDestroy(unsubscribe);
 
   let keyItemsDialog: HTMLDialogElement;
 </script>
@@ -59,8 +61,8 @@
     </div>
   </div>
   <div class="right box">
-    <button class="btn" on:click={() => log.addDamageEntry(Math.floor(Math.random() * 100))}>Click</button>
-    <button class="btn" on:click={() => keyItemsDialog.showModal()}>Key Items</button>
+    <button class="btn" onclick={() => log.addDamageEntry(Math.floor(Math.random() * 100))}>Click</button>
+    <button class="btn" onclick={() => keyItemsDialog.showModal()}>Key Items</button>
   </div>
 </section>
 

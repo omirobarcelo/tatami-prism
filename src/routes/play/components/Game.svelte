@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { afterUpdate } from 'svelte';
   import { CELL_SIZE } from '$lib/data/consts';
   import { cellIsShown, game } from '$lib/stores/game.store';
   import { Direction } from '$lib/types/direction.enum';
@@ -16,23 +15,24 @@
   const MIN_ZOOM = 0.1;
   const MAX_ZOOM = 3;
 
-  let zoom = INITIAL_ZOOM;
-  let matrix = [zoom, 0, 0, zoom, 0, 0];
+  let zoom = $state(INITIAL_ZOOM);
+  let matrix = $state([INITIAL_ZOOM, 0, 0, INITIAL_ZOOM, 0, 0]);
 
-  let svgContainer: SVGGraphicsElement;
-  let board: SVGGElement;
-  let player: SVGGElement;
+  let svgContainer: SVGGraphicsElement | undefined = $state();
+  let board: SVGGElement | undefined = $state();
+  let player: SVGGElement | undefined = $state();
 
-  afterUpdate(() => {
-    // DEBUG
-    console.log('after updating...');
-    // DEBUG
+  $effect(() => {
+    // Track player position to re-center camera
+    $game.player.position;
 
-    const svgRect = svgContainer.getBoundingClientRect();
-    const boardRect = board.getBoundingClientRect();
-    const playerRect = player.getBoundingClientRect();
-    matrix[4] = svgRect.width / 2 - (playerRect.x + playerRect.width / 2 - boardRect.x);
-    matrix[5] = svgRect.height / 2 - (playerRect.y + playerRect.height / 2 - boardRect.y);
+    if (svgContainer && board && player) {
+      const svgRect = svgContainer.getBoundingClientRect();
+      const boardRect = board.getBoundingClientRect();
+      const playerRect = player.getBoundingClientRect();
+      matrix[4] = svgRect.width / 2 - (playerRect.x + playerRect.width / 2 - boardRect.x);
+      matrix[5] = svgRect.height / 2 - (playerRect.y + playerRect.height / 2 - boardRect.y);
+    }
   });
 
   function handleWheel(event: WheelEvent) {
@@ -86,9 +86,9 @@
   }
 </style>
 
-<svelte:window on:keydown={handleKeydown} />
+<svelte:window onkeydown={handleKeydown} />
 
-<svg xmlns="http://www.w3.org/2000/svg" bind:this={svgContainer} on:wheel={handleWheel} class="board">
+<svg xmlns="http://www.w3.org/2000/svg" bind:this={svgContainer} onwheel={handleWheel} class="board">
   <g bind:this={board} transform={`matrix(${matrix.join(',')})`}>
     {#each $game.map.cells as row, x (x)}
       <g>

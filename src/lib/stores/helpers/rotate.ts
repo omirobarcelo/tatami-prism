@@ -7,7 +7,7 @@ const getNewDirection = (direction: number, rotation: Rotation): number => {
     case Rotation.Clockwise:
       return (direction + ROTATION_STEP) % MAX_ROTATION;
     case Rotation.CounterClockwise:
-      return (direction - ROTATION_STEP) % MAX_ROTATION;
+      return ((direction - ROTATION_STEP) % MAX_ROTATION + MAX_ROTATION) % MAX_ROTATION;
     default:
       return direction;
   }

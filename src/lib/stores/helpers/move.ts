@@ -162,7 +162,7 @@ const updateCurrentFloor = (game: Game, possiblePlayerPos: Position): Game => {
  * @returns updated cells according to UNCOVER_RADIUS
  */
 export const uncover = (map: CellState[][], center: Position): CellState[][] => {
-  const tmp = JSON.parse(JSON.stringify(map)) as CellState[][];
+  const tmp = map.map(row => [...row]);
 
   for (let x = -UNCOVER_RADIUS; x <= UNCOVER_RADIUS; x++) {
     for (let y = -UNCOVER_RADIUS; y <= UNCOVER_RADIUS; y++) {

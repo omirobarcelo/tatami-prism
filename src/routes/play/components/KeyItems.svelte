@@ -2,7 +2,7 @@
   import { player } from '$lib/stores/player.store';
   import Dialog from './Dialog.svelte';
 
-  export let dialog: HTMLDialogElement;
+  let { dialog = $bindable(undefined) }: { dialog?: HTMLDialogElement } = $props();
 </script>
 
 <style>

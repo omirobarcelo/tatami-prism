@@ -1,5 +1,7 @@
 <script lang="ts">
-  export let dialog: HTMLDialogElement;
+  import { type Snippet } from 'svelte';
+
+  let { dialog = $bindable(undefined), children }: { dialog?: HTMLDialogElement; children: Snippet } = $props();
 
   function handleClick(evt: MouseEvent) {
     if (evt.target === dialog) {
@@ -20,9 +22,9 @@
   }
 </style>
 
-<!-- svelte-ignore a11y-click-events-have-key-events -->
-<dialog bind:this={dialog} on:close on:click={handleClick}>
+<!-- svelte-ignore a11y_click_events_have_key_events -->
+<dialog bind:this={dialog} onclick={handleClick}>
   <div class="container">
-    <slot />
+    {@render children()}
   </div>
 </dialog>

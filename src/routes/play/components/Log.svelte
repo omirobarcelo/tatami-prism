@@ -1,14 +1,19 @@
 <script lang="ts">
-  import { beforeUpdate, afterUpdate } from 'svelte';
   import { log } from '$lib/stores/log.store';
 
-  let logElem: HTMLElement;
-  let autoscroll: boolean;
+  let logElem: HTMLElement | undefined = $state();
+  let autoscroll = $state(false);
 
-  beforeUpdate(() => (autoscroll = logElem && logElem.offsetHeight + logElem.scrollTop > logElem.scrollHeight - 20));
+  $effect.pre(() => {
+    // Access entries to track as dependency
+    $log.entries;
+    autoscroll = !!logElem && logElem.offsetHeight + logElem.scrollTop > logElem.scrollHeight - 20;
+  });
 
-  afterUpdate(() => {
-    if (autoscroll) {
+  $effect(() => {
+    // Access entries to track as dependency
+    $log.entries;
+    if (autoscroll && logElem) {
       logElem.scrollTo(0, logElem.scrollHeight);
     }
   });

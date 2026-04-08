@@ -1,4 +1,3 @@
-import { onDestroy } from 'svelte';
 import { writable } from 'svelte/store';
 import { EventKind, type GameEvent } from '$lib/types/event';
 import { log } from './log.store';
@@ -10,10 +9,6 @@ export const eventEmitter = writable<GameEvent>({ kind: EventKind.None });
 
 export const eventListener = () => {
   const unsubscribe = eventEmitter.subscribe(event => {
-    // DEBUG
-    console.log('Event triggered', event);
-    // DEBUG
-
     switch (event.kind) {
       case EventKind.PickedItem: {
         // Add item to inventory
@@ -42,5 +37,5 @@ export const eventListener = () => {
     }
   });
 
-  onDestroy(unsubscribe);
+  return unsubscribe;
 };
