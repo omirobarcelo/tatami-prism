@@ -5,12 +5,11 @@ import { Direction } from '$lib/types/direction.enum';
 import { EventKind } from '$lib/types/event';
 import type { Lock } from '$lib/types/lock';
 import type { Position } from '$lib/types/position';
-import { eventEmitter } from '../event-emitter.store';
-import type { Game } from '../game.store';
-import { playerState } from '../player.store';
+import { eventBus } from '../event-bus';
+import type { GameState } from '../game.store.svelte';
+import { player } from '../player.store.svelte';
 
 /**
- *
  * @param position
  * @param direction
  * @param map
@@ -43,9 +42,9 @@ const getNewPosition = (position: Position, direction: Direction, map: CellState
 };
 
 /**
- * Triggers Locked Door event
- * Unlocking fails if player reached a lock and does not have the key
- * If the player has the key or did not reach a lock, then unlocking is considered successful
+ * Triggers Locked Door event.
+ * Unlocking fails if player reached a lock and does not have the key.
+ * If the player has the key or did not reach a lock, then unlocking is considered successful.
  * @param locks
  * @param playerPos
  * @returns updated map locks and if unlocking failed
@@ -58,17 +57,14 @@ const checkLocks = (locks: Lock[], playerPos: Position): [locks: Lock[], locked:
     lock => lock.position.i === playerPos.i && lock.position.j === playerPos.j
   );
   if (lockFoundIdx !== -1) {
-    // Check if lock is still locked
-    locked = !playerState().keyItems.some(keyItem => keyItem.id === updatedLocks[lockFoundIdx].keyId);
+    locked = !player.keyItems.some(keyItem => keyItem.id === updatedLocks[lockFoundIdx].keyId);
 
-    // Trigger event
-    eventEmitter.set({
+    eventBus.emit({
       kind: EventKind.LockedDoor,
       data: { keyId: updatedLocks[lockFoundIdx].keyId, unlocked: !locked }
     });
 
     if (!locked) {
-      // Mark chest as opened by removing it
       updatedLocks.splice(lockFoundIdx, 1);
     }
   }
@@ -77,9 +73,9 @@ const checkLocks = (locks: Lock[], playerPos: Position): [locks: Lock[], locked:
 };
 
 /**
- * Triggers Picked Item Event
- * @param playerPos
+ * Triggers Picked Item event.
  * @param chests
+ * @param playerPos
  * @returns updated map chests
  */
 const checkChests = (chests: Chest[], playerPos: Position): Chest[] => {
@@ -89,10 +85,7 @@ const checkChests = (chests: Chest[], playerPos: Position): Chest[] => {
     chest => chest.position.i === playerPos.i && chest.position.j === playerPos.j
   );
   if (chestFoundIdx !== -1) {
-    // Trigger event
-    eventEmitter.set({ kind: EventKind.PickedItem, data: { itemId: updatedChests[chestFoundIdx].itemId } });
-
-    // Mark chest as opened by removing it
+    eventBus.emit({ kind: EventKind.PickedItem, data: { itemId: updatedChests[chestFoundIdx].itemId } });
     updatedChests.splice(chestFoundIdx, 1);
   }
 
@@ -100,7 +93,6 @@ const checkChests = (chests: Chest[], playerPos: Position): Chest[] => {
 };
 
 /**
- *
  * @param stairs
  * @param playerPos
  * @returns true if stairs and player in the same position
@@ -110,13 +102,13 @@ const checkStairs = (stairs: Position, playerPos: Position): boolean => {
 };
 
 /**
- * Switches map to next floor and increases the level
- * Triggers the Reached Next Floor Event
+ * Switches map to next floor and increases the level.
+ * Triggers the Reached Next Floor event.
  * @param game
  * @returns game with map assigned the next floor
  */
-const goToNextFloor = (game: Game): Game => {
-  eventEmitter.set({ kind: EventKind.ReachedNextFloor });
+const goToNextFloor = (game: GameState): GameState => {
+  eventBus.emit({ kind: EventKind.ReachedNextFloor });
 
   return {
     ...game,
@@ -133,15 +125,13 @@ const goToNextFloor = (game: Game): Game => {
 };
 
 /**
- * Updated current map
+ * Updates current map.
  * @param game
  * @param possiblePlayerPos
  * @returns game with updated map
  */
-const updateCurrentFloor = (game: Game, possiblePlayerPos: Position): Game => {
+const updateCurrentFloor = (game: GameState, possiblePlayerPos: Position): GameState => {
   const [locks, locked] = checkLocks(game.map.locks, possiblePlayerPos);
-  // if locked = true, unlock failed, therefore player does not move
-  // if locked = false, or there was no lock or lock was successful, therefore player moves
   const newPlayerPosition = locked ? game.player.position : possiblePlayerPos;
   return {
     ...game,
@@ -156,7 +146,6 @@ const updateCurrentFloor = (game: Game, possiblePlayerPos: Position): Game => {
 };
 
 /**
- *
  * @param map
  * @param center
  * @returns updated cells according to UNCOVER_RADIUS
@@ -179,7 +168,7 @@ export const uncover = (map: CellState[][], center: Position): CellState[][] => 
   return tmp;
 };
 
-export const move = (game: Game, direction: Direction): Game => {
+export const move = (game: GameState, direction: Direction): GameState => {
   const newPlayerPosition = getNewPosition(game.player.position, direction, game.map.cells);
   const stairsReached = checkStairs(game.map.stairs, newPlayerPosition);
   return stairsReached ? goToNextFloor(game) : updateCurrentFloor(game, newPlayerPosition);

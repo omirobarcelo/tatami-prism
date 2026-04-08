@@ -1,23 +1,27 @@
 <script lang="ts">
-  import { log } from '$lib/stores/log.store';
+  import { log } from '$lib/stores/log.store.svelte';
 
   let logElem: HTMLElement | undefined = $state();
   let autoscroll = $state(false);
 
   $effect.pre(() => {
-    // Access entries to track as dependency
-    $log.entries;
+    log.entries;
     autoscroll = !!logElem && logElem.offsetHeight + logElem.scrollTop > logElem.scrollHeight - 20;
   });
 
   $effect(() => {
-    // Access entries to track as dependency
-    $log.entries;
+    log.entries;
     if (autoscroll && logElem) {
       logElem.scrollTo(0, logElem.scrollHeight);
     }
   });
 </script>
+
+<div bind:this={logElem} class="log">
+  {#each log.entries as entry}
+    <p class="entry">{@html entry}</p>
+  {/each}
+</div>
 
 <style>
   .log {
@@ -35,9 +39,3 @@
     margin-top: 0;
   }
 </style>
-
-<div bind:this={logElem} class="log">
-  {#each $log.entries as entry}
-    <p class="entry">{@html entry}</p>
-  {/each}
-</div>

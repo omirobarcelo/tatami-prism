@@ -1,5 +1,5 @@
 import { CellState } from '$lib/types/cell-state.enum';
-import type { Map } from '$lib/types/map';
+import type { GameMap } from '$lib/types/map';
 import { ItemId } from './item-id.enum';
 
 const E = CellState.Empty;
@@ -32,7 +32,7 @@ const TestLocks = [
   }
 ];
 
-export const Test: Map = {
+export const Test: GameMap = {
   cells: TestMap,
   stairs: TestStairs,
   chests: TestChests,
@@ -52,7 +52,7 @@ const Test2Map = [
 
 const Test2Stairs = { i: 5, j: 6 };
 
-export const Test2: Map = {
+export const Test2: GameMap = {
   cells: Test2Map,
   stairs: Test2Stairs,
   chests: [],
@@ -73,7 +73,7 @@ const Test3Map = [
 
 const Test3Stairs = { i: 7, j: 7 };
 
-export const Test3: Map = {
+export const Test3: GameMap = {
   cells: Test3Map,
   stairs: Test3Stairs,
   chests: [],

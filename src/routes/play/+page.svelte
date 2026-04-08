@@ -1,44 +1,16 @@
 <script lang="ts">
   import { onDestroy } from 'svelte';
-  import { eventListener } from '$lib/stores/event-emitter.store';
-  import { log } from '$lib/stores/log.store';
+  import { startEventListener } from '$lib/stores/event-listener';
+  import { log } from '$lib/stores/log.store.svelte';
   import Game from './components/Game.svelte';
   import KeyItems from './components/KeyItems.svelte';
   import Log from './components/Log.svelte';
 
-  const unsubscribe = eventListener();
+  const unsubscribe = startEventListener();
   onDestroy(unsubscribe);
 
   let keyItemsDialog: HTMLDialogElement;
 </script>
-
-<style>
-  .page {
-    display: flex;
-    flex-direction: row;
-  }
-
-  .left,
-  .right {
-    flex: 0 0 auto;
-    width: 256px;
-  }
-
-  .center {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .map {
-    flex: 1;
-  }
-
-  .log {
-    flex: 0 0 auto;
-    height: 128px;
-  }
-</style>
 
 <svelte:head>
   <title>NEO Justine</title>
@@ -67,3 +39,31 @@
 </section>
 
 <KeyItems bind:dialog={keyItemsDialog} />
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .left,
+  .right {
+    flex: 0 0 auto;
+    width: 256px;
+  }
+
+  .center {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .map {
+    flex: 1;
+  }
+
+  .log {
+    flex: 0 0 auto;
+    height: 128px;
+  }
+</style>

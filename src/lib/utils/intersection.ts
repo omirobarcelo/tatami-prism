@@ -16,23 +16,26 @@ export const intersection = <T>(arrays: ReadonlyArray<T>[], hash = defaultHash):
     return [];
   }
 
+  // Clone to avoid mutating the caller's array
+  const sorted = [...arrays];
+
   // Put the smallest array in the beginning
-  for (let i = 1; i < arrays.length; i++) {
-    if (arrays[i].length < arrays[0].length) {
-      const tmp = arrays[0];
-      arrays[0] = arrays[i];
-      arrays[i] = tmp;
+  for (let i = 1; i < sorted.length; i++) {
+    if (sorted[i].length < sorted[0].length) {
+      const tmp = sorted[0];
+      sorted[0] = sorted[i];
+      sorted[i] = tmp;
     }
   }
 
   // Create a map associating each element to its current count
   const set = new Map();
-  for (const elem of arrays[0]) {
+  for (const elem of sorted[0]) {
     set.set(hash(elem), 1);
   }
-  for (let i = 1; i < arrays.length; i++) {
+  for (let i = 1; i < sorted.length; i++) {
     let found = 0;
-    for (const elem of arrays[i]) {
+    for (const elem of sorted[i]) {
       const hashed = hash(elem);
       const count = set.get(hashed);
       if (count === i) {
@@ -45,10 +48,10 @@ export const intersection = <T>(arrays: ReadonlyArray<T>[], hash = defaultHash):
   }
 
   // Output only the elements that have been seen as many times as there are arrays
-  return arrays[0].filter(e => {
+  return sorted[0].filter(e => {
     const hashed = hash(e);
     const count = set.get(hashed);
     if (count !== undefined) set.set(hashed, 0);
-    return count === arrays.length;
+    return count === sorted.length;
   });
 };

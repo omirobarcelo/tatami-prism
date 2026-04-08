@@ -1,14 +1,9 @@
 import type { ItemId } from '$lib/data/item-id.enum';
 
 export enum EventKind {
-  None = 'none',
   PickedItem = 'picked-item',
   LockedDoor = 'locked-door',
   ReachedNextFloor = 'reached-next-floor'
-}
-
-export interface NoneEvent {
-  kind: EventKind.None;
 }
 
 export interface PickedItemEvent {
@@ -30,4 +25,4 @@ export interface ReachedNextFloorEvent {
   kind: EventKind.ReachedNextFloor;
 }
 
-export type GameEvent = NoneEvent | PickedItemEvent | LockedDoorEvent | ReachedNextFloorEvent;
+export type GameEvent = PickedItemEvent | LockedDoorEvent | ReachedNextFloorEvent;
